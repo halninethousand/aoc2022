@@ -1,18 +1,37 @@
 fn win_lose_score(line: Vec<&str>) -> usize {
     let line: String = line.into_iter().map(|i| i.to_string()).collect::<String>();
+
+    // part1
+
     //dbg!(&line);
+    // return match line.as_str() {
+    //     "AX" =>  4,
+    //     "AY" =>  8,
+    //     "AZ" =>  3,
+    //     "BX" =>  1,
+    //     "BY" =>  5,
+    //     "BZ" =>  9,
+    //     "CX" =>  7,
+    //     "CY" =>  2,
+    //     "CZ" =>  6,
+    //     _ => unreachable!("nice input guy"),
+    // }
+    
+    // part2    
+
     return match line.as_str() {
-        "AX" =>  4,
-        "AY" =>  8,
-        "AZ" =>  3,
+        "AX" =>  3,
+        "AY" =>  4,
+        "AZ" =>  8,
         "BX" =>  1,
         "BY" =>  5,
         "BZ" =>  9,
-        "CX" =>  7,
-        "CY" =>  2,
-        "CZ" =>  6,
+        "CX" =>  2,
+        "CY" =>  6,
+        "CZ" =>  7,
         _ => unreachable!("nice input guy"),
     }
+
 }
 fn main() {
     let input = include_str!("../data/day2.txt");

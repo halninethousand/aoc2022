@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("./day1.txt");
+    let input = include_str!("../data/day1.txt");
 
     let elves = input.split("\r\n\r\n");
 
@@ -10,5 +10,5 @@ fn main() {
     elf.sort_by(|a, b| b.cmp(a));
 
     println!("{:?}", elf[0]);
-    println!("{:?}", elf.iter().take(3).sum::<u32>());
+    // println!("{:?}", elf.iter().take(3).sum::<u32>());
 }
