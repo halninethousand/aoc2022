@@ -12,22 +12,22 @@ fn main () {
         println!("{:?}", left_low.parse::<i32>().unwrap());
         println!("{:?}, {:?}, {:?}, {:?}", left_low, left_high, right_low, right_high);
         if (left_low.parse::<i32>().unwrap() <= right_low.parse::<i32>().unwrap() 
-        && right_low.parse::<i32>().unwrap() <= left_high.parse::<i32>().unwrap() 
-        && right_high.parse::<i32>().unwrap() <= left_high.parse::<i32>().unwrap())
-            || (right_low.parse::<i32>().unwrap() <= left_low.parse::<i32>().unwrap() 
-            && left_low.parse::<i32>().unwrap() <= right_high.parse::<i32>().unwrap() 
-            && left_high.parse::<i32>().unwrap() <= right_high.parse::<i32>().unwrap()) {
-                score += 1; 
-                println!("adding")
-        }
+            && right_low.parse::<i32>().unwrap() <= left_high.parse::<i32>().unwrap() 
+            && right_high.parse::<i32>().unwrap() <= left_high.parse::<i32>().unwrap())
+                || (right_low.parse::<i32>().unwrap() <= left_low.parse::<i32>().unwrap() 
+                && left_low.parse::<i32>().unwrap() <= right_high.parse::<i32>().unwrap() 
+                && left_high.parse::<i32>().unwrap() <= right_high.parse::<i32>().unwrap()) {
+                    score += 1; 
+                    println!("adding")
+            }
         println!("{:?}", score);
         if (left_low.parse::<i32>().unwrap() <= right_low.parse::<i32>().unwrap() 
-        && right_low.parse::<i32>().unwrap() <= left_high.parse::<i32>().unwrap()) 
-            || (right_low.parse::<i32>().unwrap() <= left_low.parse::<i32>().unwrap() 
-            && left_low.parse::<i32>().unwrap() <= right_high.parse::<i32>().unwrap()) { 
-                score_2 += 1; 
-                println!("adding")
-        }
+            && right_low.parse::<i32>().unwrap() <= left_high.parse::<i32>().unwrap()) 
+                || (right_low.parse::<i32>().unwrap() <= left_low.parse::<i32>().unwrap() 
+                && left_low.parse::<i32>().unwrap() <= right_high.parse::<i32>().unwrap()) { 
+                    score_2 += 1; 
+                    println!("adding")
+            }
     } 
     println!("{:?}", score);
     println!("{:?}", score_2);
