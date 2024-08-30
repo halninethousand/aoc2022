@@ -33,6 +33,54 @@ fn main() {
     } else {
         println!("No valid path found");
     }
+
+    let start_points: Vec<(usize, usize)> = input.iter()
+        .enumerate()
+        .flat_map(|(i, inner_vec)| {
+            inner_vec.iter()
+                .enumerate()
+                .filter_map(move |(j, &c)| {
+                    if c == 'a' || c == 'S' {  // Treat 'S' as 'a'
+                        Some((i, j))
+                    } else {
+                        None
+                    }
+                })
+        })
+        .collect();
+
+    // Locate the end position 'E'
+    let end = input.iter()
+        .enumerate()
+        .flat_map(|(i, inner_vec)| {
+            inner_vec.iter()
+                .enumerate()
+                .filter_map(move |(j, &c)| {
+                    if c == 'E' {
+                        Some((i, j))
+                    } else {
+                        None
+                    }
+                })
+        })
+        .next()
+        .expect("End position 'E' not found!");
+
+    let mut min_steps: Option<usize> = None;
+
+    for start in start_points {
+        if let Some(steps) = bfs(&input, start, end) {
+            min_steps = match min_steps {
+                Some(current_min) => Some(current_min.min(steps)),
+                None => Some(steps),
+            };
+        }
+    }
+
+    match min_steps {
+        Some(steps) => println!("The shortest path takes {} steps.", steps),
+        None => println!("No valid path found from any 'a' position."),
+    }
 }
 
 fn bfs(grid: &[Vec<char>], start: (usize, usize), end: (usize, usize)) -> Option<usize> {
