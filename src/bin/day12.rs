@@ -1,13 +1,14 @@
-const ALPHABET: [char; 26] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-const alpha: &str = "abcdefghijklmnopqrstuvwxyz";
+use std::collections::{VecDeque, HashSet};
+
+const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyz";
 
 fn main() {
-    let input: Vec<Vec<char>> = include_str!("../data/day12_short.txt").lines().map(|line| line.chars().collect()).collect();
-    println!("{:?}", input);
-    
+    let input: Vec<Vec<char>> = include_str!("../data/day12.txt")
+        .lines()
+        .map(|line| line.chars().collect())
+        .collect();
 
-    let start_end_indices: Vec<(usize, usize)> = input 
+    let start_end_indices: Vec<(usize, usize)> = input
         .iter()
         .enumerate()
         .flat_map(|(i, inner_vec)| {
@@ -15,7 +16,7 @@ fn main() {
                 .iter()
                 .enumerate()
                 .filter_map(move |(j, &c)| {
-                    if c.is_uppercase() {
+                    if c == 'S' || c == 'E' {
                         Some((i, j))
                     } else {
                         None
@@ -24,52 +25,82 @@ fn main() {
         })
         .collect();
 
-    let S = start_end_indices[0];
-    let E = start_end_indices[1];
+    let start = start_end_indices[0];
+    let end = start_end_indices[1];
+    
+    if let Some(steps) = bfs(&input, start, end) {
+        println!("Found a path with {} steps", steps);
+    } else {
+        println!("No valid path found");
+    }
+}
 
-    let directions = possible_directions(&input, S.0, S.1);
-    println!("{:?}", directions);
+fn bfs(grid: &[Vec<char>], start: (usize, usize), end: (usize, usize)) -> Option<usize> {
+    let mut queue = VecDeque::new();
+    let mut visited = HashSet::new();
+    
+    queue.push_back((start, 0));
+    visited.insert(start);
 
-    println!("{:?}", start_end_indices);
+    while let Some(((y, x), steps)) = queue.pop_front() {
+        if (y, x) == end {
+            return Some(steps);
+        }
+
+        let directions = possible_directions(grid, y, x);
+        for ((new_y, new_x), _) in directions {
+            let new_pos = (new_y as usize, new_x as usize);
+            if !visited.contains(&new_pos) {
+                visited.insert(new_pos);
+                queue.push_back((new_pos, steps + 1));
+            }
+        }
+    }
+
+    None
 }
 
 fn possible_directions(grid: &[Vec<char>], y: usize, x: usize) -> Vec<((i32, i32), char)> {
     let offsets = [
-                (-1, 0),
-        (0, -1),         (0, 1),
-                (1, 0),
+        (-1, 0),
+        (1, 0),
+        (0, -1),
+        (0, 1),
     ];
     
     let rows = grid.len();
     let cols = grid[0].len();
-
     let mut directions = vec![];
-    
-    for (dx, dy) in offsets.iter() {
-        let new_y = y as i32 + dx;
-        let new_x = x as i32 + dy;
-        let mut current_char = grid[y][x];
+    let current_char = match grid[y][x] {
+        'S' => 'a',
+        'E' => 'z',
+        other => other,
+    };
 
-        if current_char == 'S' {
-            current_char = 'a';
-        }
+    for &(dy, dx) in &offsets {
+        let new_y = y as i32 + dy;
+        let new_x = x as i32 + dx;
 
         if new_y >= 0 && new_y < rows as i32 && new_x >= 0 && new_x < cols as i32 {
-            if is_equal_or_bigger(alpha, grid[new_y as usize][new_x as usize], current_char) {
-                directions.push(((new_y, new_x), grid[y][x]));
+            let adjacent = match grid[new_y as usize][new_x as usize] {
+                'S' => 'a',
+                'E' => 'z',
+                other => other,
+            };
+            if is_equal_or_one_bigger(current_char, adjacent) {
+                directions.push(((new_y, new_x), adjacent));
             }
-            println!("new y: {} new x: {}", new_y, new_x);
         }
     }
     directions
 }
 
-fn is_equal_or_bigger(alphabet: &str, input_char: char, compare_char: char) -> bool {
-    let input_index = alphabet.find(input_char);
-    let compare_index = alphabet.find(compare_char);
+fn is_equal_or_one_bigger(current: char, adjacent: char) -> bool {
+    let current_index = ALPHABET.find(current);
+    let adjacent_index = ALPHABET.find(adjacent);
 
-    match (input_index, compare_index) {
-        (Some(i), Some(j)) => i >= j,
+    match (current_index, adjacent_index) {
+        (Some(c), Some(a)) => a <= c + 1,
         _ => false,
     }
 }
