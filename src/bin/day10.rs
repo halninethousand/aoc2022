@@ -1,12 +1,14 @@
-use std::collections::HashMap;
-
 fn main() {
     let input: Vec<String> = include_str!("../data/day10.txt").lines().map(|s| s.to_owned()).collect();
+
+    enum State {
+        Busy(i32),
+        Idle,
+    }
     
     struct Machine {
         input: Vec<String>,
         cycle: u32,
-        timer: HashMap<i32, u8>,
         register: i32,
         measure: [u32; 6],
         sum: i32,
@@ -17,64 +19,41 @@ fn main() {
             Machine {
                 input,
                 cycle: 0,
-                timer: HashMap::new(),
                 register: 1,
                 measure: [20, 60, 100, 140, 180, 220],
                 sum: 0,
             }
         }
 
-        fn r#loop(&mut self) {
-            
-            let mut ops = self.input.iter();
+        fn tick(&mut self) {
+            self.cycle += 1;
 
-            loop {
-                self.cycle += 1;
+            if self.measure.contains(&self.cycle) {
+                self.sum += self.cycle as i32 * self.register;
+                println!("CYCLE: {}, REGISTER: {}", self.cycle, self.register);
+            }
+        }
 
-                if let Some(op) = ops.next() {
-                    if op.starts_with("add") {
-                        let mut op = op.split_whitespace();
-                        op.next();
-                        let value = op.next().unwrap().parse::<i32>().unwrap();
-                        
-                        self.timer.insert(value, 2);
-                    }
-                } else {
-                    println!("EXHAUSTED");
-                    if self.timer.is_empty() {
-                        break;
-                    }
-                }
-                
-                for value in self.timer.values_mut() {
-                    *value -= 1;
-                }
+        fn addx(&mut self, incr: i32) {
+            self.tick();
+            self.tick();
+            self.register += incr;
+        }
 
-                let keys_to_add: Vec<_> = self.timer 
-                    .iter()
-                    .filter(|&(_, &v)| v == 0)
-                    .map(|(k, _)| k.clone())
-                    .collect();
+        fn run_instructions(&mut self) {
+            for line in self.input.clone() {
+                let instruction: Vec<&str> = line.split(' ').collect();
 
-                let _: Vec<_> = keys_to_add
-                    .iter()
-                    .filter_map(|key| self.timer.remove(key))
-                    .collect();
-
-                for value in keys_to_add {
-                    println!("adding VALUE {}", value);
-                    self.register += value;
-                }
-
-                if self.measure.contains(&self.cycle) {
-                    self.sum += self.cycle as i32 * self.register;
-                    println!("CYCLE: {}, REGISTER: {}", self.cycle, self.register);
+                match instruction[0] {
+                    "noop" => self.tick(),
+                    "addx" => self.addx(instruction[1].parse::<i32>().expect("Should be an int")),
+                    _ => unimplemented!(),
                 }
             }
         }
     }
 
     let mut machine = Machine::new(input);
-    machine.r#loop();
-    println!("end sum: {:?}", machine.sum);
+    machine.run_instructions();
+    println!("signal strength sum: {:?}", machine.sum);
 }
